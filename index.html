@@ -1,1 +1,32 @@
-Hello World
+// ahora usamo como estado inicial `undefined`
+// que nos servirá para saber si ya hemos calculado
+// si el usuario tiene adBlocker
+let isAdBlockEnabled = undefined
+
+const checkIsAdBlockEnabled = () => {
+  // con esto evitamos que se vuelva a manipular el DOM
+  // si ya sabemos si el resultado de la ejecución anterior
+  if (typeof isAdBlockEnabled !== 'undefined')
+    return Promise.resolve(isAdBlockEnabled)
+
+  const ad = document.createElement('div')
+  ad.innerHTML = '&nbsp;'
+  ad.className = 'adsbox'
+  document.body.appendChild(ad)
+
+  return new Promise(resolve => {
+    window.setTimeout(() => {
+      // si el elemento no tiene altura, es que
+      // el AdBlocker se lo ha cargado
+      isAdBlockEnabled = ad.offsetHeight === 0
+      // eliminamos el "falso" anuncio
+      ad.remove()
+      resolve(isAdBlockEnabled)
+    }, 100)
+  })
+}
+
+// ya lo podrías usar en cualquier parte de tu código así
+checkIsAdBlockEnabled().then(isAdBlockEnabled => {
+  console.log(isAdBlockEnabled)
+})
